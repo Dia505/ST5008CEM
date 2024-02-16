@@ -7,8 +7,15 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 public class ImageDownloaderApp extends JFrame {
     private JTextField urlTextField;
@@ -191,6 +198,7 @@ public class ImageDownloaderApp extends JFrame {
             public void run() {
                 int totalBytesRead = 0;
                 int fileSize = 0;
+
                 try {
                     URL url = new URL(urlString);
                     URLConnection connection = url.openConnection();
@@ -200,6 +208,7 @@ public class ImageDownloaderApp extends JFrame {
                     int n;
                     totalBytesRead = 0;
                     ByteArrayOutputStream out = new ByteArrayOutputStream(); // Create new ByteArrayOutputStream for each download
+
                     while (-1 != (n = in.read(buf))) {
                         if (isCanceled || Thread.currentThread().isInterrupted()) {
                             Thread.interrupted();
@@ -213,6 +222,7 @@ public class ImageDownloaderApp extends JFrame {
                             });
                             return;
                         }
+
                         while (isPaused) { // Wait until the pause is lifted
                             try {
                                 Thread.sleep(100); // Adjust sleep time as needed
@@ -220,6 +230,7 @@ public class ImageDownloaderApp extends JFrame {
                                 ex.printStackTrace();
                             }
                         }
+
                         out.write(buf, 0, n);
                         totalBytesRead += n;
                         int progress = (int) ((double) totalBytesRead / fileSize * 100);
@@ -247,6 +258,14 @@ public class ImageDownloaderApp extends JFrame {
                             revalidate();
                             repaint();
                             downloadButton.setEnabled(true); // Re-enable download button after download completes
+
+                            try {
+                                BufferedImage image = ImageIO.read(new ByteArrayInputStream(response));
+                                saveImage(image);
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }
@@ -269,6 +288,24 @@ public class ImageDownloaderApp extends JFrame {
                 }
             }
         });
+    }
+
+    private void saveImage(BufferedImage image) {
+        try {
+
+            String downloadsFolder = System.getProperty("user.home") + File.separator + "Downloads";
+
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+            String fileName = dateFormat.format(new Date()) + ".png";
+
+
+            Path outputPath = Paths.get(downloadsFolder, fileName);
+            ImageIO.write(image, "png", outputPath.toFile());
+
+        } catch (IOException e) {
+            System.out.println("Error saving image: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
