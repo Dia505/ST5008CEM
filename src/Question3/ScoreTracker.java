@@ -3,6 +3,16 @@ package Question3;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/*
+Approach: The question asks us to keep track of scores and then calculate median score from the stream.
+The use of arraylist is to be able to add as many scores as the user requires due to its dynamic size.
+Since the questions asks to calculate the median, with each score that is added to the list, the list is arranged in ascending order for efficient median calculation
+After the data stream is populated, the median formula is followed.
+The middle index of the stream is calculated.
+If the stream has odd number of data, then the middle data would be the median, which would be extracted using the middle index.
+But with an even number of data, two middle numbers are taken and their average is calculated.
+*/
+
 public class ScoreTracker {
     // Arraylist has been used to construct a data stream of scores
     // Arraylist has dynamic size, so can fit as many scores as the user wants

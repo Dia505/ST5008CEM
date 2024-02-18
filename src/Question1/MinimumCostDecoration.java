@@ -1,17 +1,32 @@
 package Question1;
 
+/*
+Approach: This question has been approached using the concept of dynamic programming.
+Dynamic programming helps to solve a problem by subdividing it into smaller sub-problems.
+We start focusing on those sub-problems to create sub-solutions for them, and in time, builds the whole solution for the original problem
+Dynamic programming also helps in finding the optimal solution, depending on the sub-solutions of the problem.
+Here, we have been tasked to find the minimum cost to decorate a number of venues with a particular theme from an array of themes
+We first initialize the dp table with the first venue and first theme.
+Then we focus on finding the minimum cost for decorating the first two venues, by comparing the costs for each theme.
+After that we move on first three venues, first four venues and so on.
+So the optimal solution is being built by the creation of optimal sub-solutions
+*/
+
 public class MinimumCostDecoration {
     // Function to calculate minimum cost to decorate venues
     // 2D matrix costs is taken as parameter, which defines cost of each venue for each theme
-    public static int minCostToDecorateVenues(int[][] costs) {
+    public static int minCostToDecorateVenues(int costs[][]) {
         if (costs == null || costs.length == 0) {
             return 0;
         }
 
+        // n: number of venues
         int n = costs.length;
+        //k: number of themes
         int k = costs[0].length;
 
         // In the case of there being only one venue
+        // The themes of that venue are simply compared to each other to find the minimum costing theme
         if (n == 1) {
             int min = Integer.MAX_VALUE;
             for (int cost : costs[0]) {
@@ -20,7 +35,7 @@ public class MinimumCostDecoration {
             return min;
         }
 
-        int[][] dp = new int[n][k];
+        int dp[][] = new int[n][k];
 
         // Initialize the dp table with the costs of the first venue i.e. venue 0
         for (int j = 0; j < k; j++) {

@@ -3,6 +3,18 @@ package Question4;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+Approach: In a provided binary tree, the question gives us a node k and x number of nodes that are closest to that k node.
+To find those x number of closest nodes, in-order traversal has been implemented.
+When in-order traversal occurs in a binary tree, since it starts from left tree, goes to node and then right tree, it returns the nodes in an ascending order.
+When the nodes have been sorted in ascending order, finding the closest nodes becomes easier.
+An array list has been used to store the closest nodes.
+The idea is to first populate this list until it's length is equal with x.
+After that, comparison occurs with the incoming node and the first node present in the array.
+By comparing the differences between the node k and incoming node and between node k and the first node of array,
+the smaller difference offers us with a better solution i.e. a node that is closer to k
+*/
+
 public class ClosestValueBinaryTree {
     // Class Node to create the balanced binary tree
     public static class Node {
