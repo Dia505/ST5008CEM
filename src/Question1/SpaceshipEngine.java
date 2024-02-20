@@ -43,7 +43,7 @@ public class SpaceshipEngine {
     }
 
     public static void main(String[] args) {
-        int[] engines = {2,1,3};
+        int engines[] = {2,1,3};
         int splitCost = 1;
 
         int result = minTimeBuildEngine(engines, splitCost);
@@ -51,3 +51,17 @@ public class SpaceshipEngine {
         System.out.println("Minimum time required to build engines: " + result);
     }
 }
+
+/*
+Example:
+engines: [2,1,3] added to Priority Queue pq => [1,2,3]
+splitCost = 1
+
+engine1Time = 1
+engine2Time = 2
+totalTime = 1 + Math.max(1,2) = 3
+
+for loop: (i = 0; i<=pq.size() = 1; i++)
+engineTime = pq.remove() = 3
+totalTime = 1 + Math.max(3,3) = 4
+*/

@@ -79,3 +79,20 @@ public class ClosestValueBinaryTree {
         System.out.println("Closest values to " + k + ": " + closestValues);
     }
 }
+
+/*
+Example:
+Tree (in array form): [4,2,5,1,3,6]
+k = 3.8
+x = 2 meaning there are 2 nodes closest to 3.8
+array list - closestValues to store the data of the nodes
+
+In-order stars from 1
+Until the size of closestValues is not equal to x, the data of incoming nodes are added so
+1 and 2 are added i.e. [1,2]
+Then comes 3, but closestValue's size == x. So there is a comparison between 3 and closestValue[0] == 1
+Math.abs(3 - 3.8) < Math.abs(1 - 3.8) = 0.8 < 2.8
+So 1 is removed and 3 is added i.e. [2,3]
+Then,
+Math.abs(2 - 3.8) < Math.abs(4 - 3.8) = 2.8 > 1.8 so, [3,4] and so on.
+*/

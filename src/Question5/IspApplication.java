@@ -5,10 +5,11 @@ import java.util.List;
 
 /*
 Approach: The question asks us to find the impacted devices connected to the device experiencing power failure.
-First an adjacent matrix is created called network and populated with the connections between different devices
-Then the devices that are directly connected to the target device are found
-On doing so, depth first search is applied for each connected device, to determine if they lead to the source or not
+First an adjacent matrix is created called network and populated with the connections between different devices.
+Then the devices that are directly connected to the target device are found.
+On doing so, depth first search is applied for each connected device, while checking if they are connected to source in any way.
 If a connected device does not lead to the source, all the devices involved in the dfs, including that connected device are added to the list of impacted devices
+The devices connected directly or indirectly to the source are also extracted using a helper function and used in the DFS function
 */
 
 public class IspApplication {
@@ -23,8 +24,10 @@ public class IspApplication {
     }
 
     // Function to add edge between connected devices
+    // undirected graph
     public void addEdge(int source, int destination){
         network[source][destination]=1;
+        network[destination][source] = 1;
     }
 
     public void printNetwork() {
@@ -36,63 +39,90 @@ public class IspApplication {
         }
     }
 
-    // Function to find the devices directly connected to the target
+    // Function to find the devices directly connected to the target or source
     List<Integer> getConnectedDevices(int root){
-        List<Integer> adjlist=new ArrayList<>();
+        List<Integer> connectedDevices=new ArrayList<>();
         for(int j=0; j<v;j++){
-            if(network[root][j]!=0){
-                adjlist.add(j);
+            if(network[root][j]!=0 || network[j][root]!=0){
+                connectedDevices.add(j);
             }
         }
-        return adjlist;
-
+        return connectedDevices;
     }
 
     // Function to find the impacted devices
-    List<Integer> findImpactedDevices(int targetDevice) {
-        List<Integer> connectedDevices = getConnectedDevices(targetDevice);
+    public List<Integer> findImpactedDevices(int targetDevice, int source) {
+        List<Integer> connectedDevicesToTarget = getConnectedDevices(targetDevice);
+        List<Integer> connectedDevicesToSource = getConnectedDevices(source);
         List<Integer> impactedDevices = new ArrayList<>();
         boolean visited[] = new boolean[v];
 
-        // Iteration over the connected devices, dfs is called for each iteration
-        for (int device : connectedDevices) {
+        // The source and its direct connections are marked as true to avoid them being added to the impactedDevice list
+        visited[source] = true;
+        for (int device : connectedDevicesToSource) {
+            visited[device] = true;
+        }
+
+        // Traverse the connected devices excluding source and its direct connections
+        for (int device : connectedDevicesToTarget) {
             if (!visited[device]) {
-                dfsCheckSource(device, visited, impactedDevices);
+                dfsCheckSource(device, visited, impactedDevices, source, targetDevice);
             }
         }
 
         return impactedDevices;
     }
 
-    // function where dfs occurs to check if the connected device leads to a source
-    void dfsCheckSource(int node, boolean visited[], List<Integer> impactedDevices) {
-        System.out.println("Node: " + node);
+    private void dfsCheckSource(int node, boolean visited[], List<Integer> impactedDevices, int source, int targetDevice) {
         visited[node] = true;
 
-        // If the node is the source i.e. 0, return
-        if (node == 0) {
+        // If the node happens to be the targetDevice, which is not an impacted device
+        if (node == targetDevice) {
             return;
         }
 
-        // Iterate through the adjacent nodes of the current node
+        // To check direct/indirect connections to the source
+        boolean connectedToSource = false;
+
         for (int i = 0; i < v; i++) {
-            // In the case that the current node is connected to the source, loop is exited
-            if(i == 0 && network[i][node] != 0) {
-                System.out.println("Device " + node + " is connected to source");
-                break;
-            }
-            else if (network[node][i] != 0 && !visited[i]) {
-                dfsCheckSource(i, visited, impactedDevices);
+            if ((network[node][i] != 0 || network[i][node] != 0) && !visited[i]) {
+                // DFS function called recursively
+                dfsCheckSource(i, visited, impactedDevices, source, targetDevice);
+                // If the iteration variable i is connected to source, directly or undirectly, connectedToSource becomes true
+                if (isConnectedToSource(i, source, visited)) {
+                    connectedToSource = true;
+                }
             }
         }
 
-        // If the current node is not reachable from the source, add it to impactedDevices list
-        impactedDevices.add(node);
-        System.out.println("impacted devices: " + impactedDevices);
+        // If the node is not directly or indirectly connected to the source, it is added to the impactedDevices list
+        if (!connectedToSource) {
+            impactedDevices.add(node);
+        }
+    }
+
+    // Helper method to check if a node is indirectly connected to the source
+    private boolean isConnectedToSource(int node, int source, boolean visited[]) {
+        visited[node] = true;
+
+        // If the node itself is the source or directly connected to the source, return true
+        if (node == source) {
+            return true;
+        }
+
+        // Check if the node is indirectly connected to the source through another node
+        for (int i = 0; i < v; i++) {
+            if ((network[node][i] != 0 || network[i][node] != 0) && !visited[i]) {
+                if (isConnectedToSource(i, source, visited)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static void main(String[] args) {
-        int edges[][] = {{0,1},{0,2},{1,3},{1,6},{2,4},{4,6},{4,5},{5,7}};
         int target = 4;
         int powerSource = 0;
 
@@ -109,8 +139,31 @@ public class IspApplication {
 
         isp.printNetwork();
 
-        List<Integer> impDevice = isp.findImpactedDevices(target);
+        List<Integer> impDevice = isp.findImpactedDevices(target, powerSource);
 
         System.out.println("Impacted Device List: " + impDevice);
     }
 }
+
+/*
+Example:
+Network matrix:
+0 -> 1
+0 -> 2
+1 -> 3
+1 -> 6
+2 -> 4
+4 -> 6
+4 -> 5
+5 -> 7
+
+Target device: 4
+Power source - 0
+
+Since 4 is connected to 5 only and 7 is connected to 5, when the power is cut off at 4,
+5 and 7 become the impacted devices
+
+Output: [7, 5]
+ */
+
+

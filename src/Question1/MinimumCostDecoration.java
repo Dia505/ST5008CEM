@@ -75,7 +75,7 @@ public class MinimumCostDecoration {
 
     // Main method
     public static void main(String[] args) {
-        int[][] costs = new int[3][3];
+        int costs[][] = new int[3][3];
         costs[0][0] = 1;
         costs[0][1] = 3;
         costs[0][2] = 2;
@@ -91,3 +91,31 @@ public class MinimumCostDecoration {
         System.out.println("Minimum cost to decorate given venues: " + minCost);
     }
 }
+
+/*
+Example:
+theme 0 + venue 0 = 1
+theme 0 + venue 1 = 3
+theme 0 + venue 2 = 2
+theme 1 + venue 0 = 4
+theme 1 + venue 1 = 6
+theme 1 + venue 2 = 8
+theme 2 + venue 0 = 3
+theme 2 + venue 1 = 1
+theme 2 + venue 2 = 5
+
+First dp matrix initialized with cost of decorating venue 0 with all three themes
+dp[0][0] = 1
+dp[0][1] = 3
+dp[0][2] = 2
+
+minCost = infinity
+when prev_j = 1 and j = 0 and i = 1,
+minCost = Math.min(infinity, dp[0][1] + costs[1][0]) = infinity, 3+4 = 7
+when prev_j = 2 and j = 0 and i = 1,
+minCost = Math.min(7, dp[0][2] + costs[1][0]) = 7, 2+4 = 6
+minCost for dp[1][0] = 6
+
+and so on the dp table is populated with minimum cost of every venue with each theme, making sure that the previously chosen theme is not the same
+Out of the last row of dp, the minimum cost is calculated, which is 7
+*/

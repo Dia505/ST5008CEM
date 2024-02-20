@@ -57,3 +57,10 @@ public class ScoreTracker {
         System.out.println("Median of scores: " + median);
     }
 }
+
+/*
+Example:
+Stream: [85.5, 92.3, 77.8, 90.1] sorted to => [77.8, 85.5, 90.1, 92.3]
+middleIndex = 4/2 = 2
+So, middleMean = (85.5 + 90.1)/2 = 87.8
+*/
